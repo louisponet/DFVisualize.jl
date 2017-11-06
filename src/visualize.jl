@@ -45,7 +45,7 @@ function visualize_band(x::WannierModel,band,iso,args...;kwargs...)
 end
 
 "Takes a glcontext and visualizes the WannierBand of the WannierModel."
-function visualize_band!(screen,x::TbModel{T},band,iso,k_points=nothing,args...;rate=10,soc=false,data=:wfc,kwargs...) where T
+function visualize_band!(screen,x::WannierModel{T},band,iso,k_points=nothing,args...;rate=10,soc=false,data=:wfc,kwargs...) where T
   if k_points==nothing
     if soc==false
       tbband = calculate_eig_cm(x)[1][band]
@@ -191,7 +191,7 @@ function visualize_two_spin_band(up_band,down_band,wfcs,iso,args...;kwargs...)
 end
 
 "Takes a glcontext and visualizes the sum of the two supplied bands. This is intended to visualize the density of the sum of the spin up and spin down components of a band."
-function visualize_two_spin_band!(screen,band_up::TbBand{T},band_dn::TbBand{T},wfcs::Array{Wfc3D{T},1},iso,args...;rate=10,data=:wfc,bloch=false,kwargs...) where T
+function visualize_two_spin_band!(screen,band_up::WannierBand{T},band_dn::WannierBand{T},wfcs::Array{Wfc3D{T},1},iso,args...;rate=10,data=:wfc,bloch=false,kwargs...) where T
   k_vertices = Array{Array{Point3f0,1},1}(length(band_up.k_points))
   k_colors = Array{Array{RGBA{Float32},1},1}(length(band_up.k_points))
   wfcs = 1000.0*normalize.(wfcs)
