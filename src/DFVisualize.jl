@@ -5,11 +5,13 @@ module DFVisualize
   using GeometryTypes
   using GLVisualize
   using GLAbstraction
+  using FileIO
+  using ColorTypes
 
   include("types.jl")
 
   include("calcs.jl")
-
+  include("graphics.jl")
   include("visualize.jl")
   export visualize_wfc
   export visualize_wfc!
