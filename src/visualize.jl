@@ -14,13 +14,44 @@ end
 
 "Takes a given glcontext, wavefunction and puts the wavefunction visualization in it."
 function visualize_wfc!(screen,wfc::Wfc3D,iso,args...)
+  vertices_pos, vertices_neg = marching_cubes(wfc,iso)
+  center_pos  = sum(vertices_pos)/length(vertices_pos)
+  center_neg  = sum(vertices_neg)/length(vertices_neg)
+  normals_pos = Point3f0[]
+  normals_neg = Point3f0[]
+  for vert in vertices_pos
+    push!(normals_pos, normalize(vert-center_pos))
+  end
+  for vert in vertices_neg
+    push!(normals_neg, normalize(vert-center_neg))
+  end
+  shader = get_shader()
+
+  robj_pos = RenderObject(Dict(:vertices => GLBuffer(vertices_pos),
+  :normals => GLBuffer(normals_pos),
+  :vertex_color => GLBuffer([RGBA(1f0,0f0,0f0,0.6f0) for i=1:length(vertices_pos)]),
+  :model => Mat4f0(eye(4))),shader,GLAbstraction.StandardPrerender())
+  robj_pos.postrenderfunction = TransparentPostrender(robj_pos.vertexarray, GL_TRIANGLES,robj_pos.vertexarray.program.uniformloc[:pass][1])
+
+  robj_neg = RenderObject(Dict(:vertices => GLBuffer(vertices_neg),
+  :normals => GLBuffer(normals_neg),
+  :vertex_color => GLBuffer([RGBA(0f0,0f0,1f0,0.6f0) for i=1:length(vertices_neg)]),
+  :model => Mat4f0(eye(4))),shader,GLAbstraction.StandardPrerender())
+  robj_neg.postrenderfunction = TransparentPostrender(robj_neg.vertexarray, GL_TRIANGLES,robj_neg.vertexarray.program.uniformloc[:pass][1])
+ 
+  # vertices = [vertices_pos;vertices_neg]
+  # colors = [[RGBA(1f0,0f0,0f0,0.6f0) for i=1:length(vertices_pos)];[RGBA(0f0,0f0,1f0,0.6f0) for i=1:length(vertices_neg)]]
+  # mesh   = GLNormalVertexcolorMesh(vertices=vertices,faces=[Face(i,i+1,i+2) for i=1:3:length(vertices)],color=colors)
+  # bounding_box = const_lift(GLBoundingBox,mesh)
+  
+  # robj   = RenderObject(Dict(:bounding_box => bounding_box,:program=>shader),shader,,nothing,bounding_box,mesh)
+  # robj.postrenderfunction = 
+  # println(robj.vertexarray)
+  # test = visualize(mesh)
+  # visualize_atom!(screen,wfc.atom)
   visualize_cell!(screen,wfc.cell)
-  visualize_atom!(screen,wfc.atom)
-  vertices_pos,vertices_neg = marching_cubes(wfc,iso)
-  vertices = [vertices_pos;vertices_neg]
-  colors = [[RGBA(1f0,0f0,0f0,0.6f0) for i=1:length(vertices_pos)];[RGBA(0f0,0f0,1f0,0.6f0) for i=1:length(vertices_neg)]]
-  mesh   = GLNormalVertexcolorMesh(vertices=vertices,faces=[Face(i,i+1,i+2) for i=1:3:length(vertices)],color=colors)
-  _view(visualize(mesh),screen,camera=:perspective,position=Vec3f0(0))
+  _view(robj_pos,screen,camera=:perspective,position=Vec3f0(0))
+  _view(robj_neg,screen,camera=:perspective,position=Vec3f0(0))
 end
 
 "Takes a given glcontext, wavefunctions and puts the visualizations for the multiple wavefunctions in it."

@@ -10,7 +10,7 @@ function vertex_interp(iso,p1,p2,valp1,valp2)
   end
 end
 
-function marching_cubes(values::Array{T,3},points::Array{Point3D{T},3},iso,cube_size=1) where T
+function marching_cubes(values::Array{T,3},points::Array{Point3D{T},3},iso,cube_size=1) where T<:AbstractFloat
   iso = T(iso)
   vertices     = Array{Point3f0,1}()
   indices      = Array{Tuple{Int,Int,Int},1}()
@@ -84,6 +84,15 @@ function marching_cubes(values::Array{T,3},points::Array{Point3D{T},3},iso,cube_
     ind_pushed = false        
   end
   return vertices,indices
+end
+
+function marching_cubes(wfc::Wfc3D{T},iso,cube_size=1) where T
+  grid_neg     = T[real(x.w) <0 ? abs(real(x.w)) :  0.000001 for x in wfc.points]
+  grid_pos     = T[real(x.w) >0 ? real(x.w) :  0.000001 for x in wfc.points]
+  points       = [p.p for p in wfc.points]
+  @time vertices_neg = marching_cubes(grid_neg,points,iso,cube_size)[1]
+  vertices_pos = marching_cubes(grid_pos,points,iso,cube_size)[1]
+  return vertices_pos,vertices_neg
 end
 
 function get_edge_tri_table()

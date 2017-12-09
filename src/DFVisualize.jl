@@ -5,6 +5,9 @@ module DFVisualize
   using GeometryTypes
   using GLVisualize
   using GLAbstraction
+  using GLWindow
+  using Reactive
+  using ModernGL
   using FileIO
   using ColorTypes
 
