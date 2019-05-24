@@ -1,0 +1,11 @@
+name = "DFVisualize"
+uuid = "fe8e2d1c-6d08-11e9-1c54-97204597831a"
+authors = ["louisponet <louisponet@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DFControl = "1e31e15d-4957-550d-a244-318eced754ae"
+GLAbstraction = "ca6e7d0a-b0c9-59ca-8aba-aebf11497e1c"
+Glimpse = "f6e19d58-12a4-5927-8606-ac30a9ce9b69"
+InlineExports = "809d7502-0c9d-5bc2-962a-5201dc498f73"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
